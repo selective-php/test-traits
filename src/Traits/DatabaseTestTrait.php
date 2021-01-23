@@ -22,10 +22,16 @@ trait DatabaseTestTrait
      *
      * TestCases must call this method inside setUp().
      *
+     * @param string|null $schemaFile The sql schema file
+     *
      * @return void
      */
-    protected function setUpDatabase(): void
+    protected function setUpDatabase(string $schemaFile = null): void
     {
+        if (isset($schemaFile)) {
+            $this->schemaFile = $schemaFile;
+        }
+
         $this->getConnection();
 
         $this->createTables();

@@ -20,14 +20,14 @@ trait ContainerTestTrait
      *
      * TestCases must call this method inside setUp().
      *
+     * @param Container|null $container The container
+     *
      * @throws UnexpectedValueException
      *
      * @return void
      */
-    protected function setUpContainer(): void
+    protected function setUpContainer(Container $container = null): void
     {
-        $container = $this->app->getContainer();
-
         if ($container instanceof Container) {
             $this->container = $container;
 
