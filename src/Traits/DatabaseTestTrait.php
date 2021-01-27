@@ -34,6 +34,7 @@ trait DatabaseTestTrait
 
         $this->getConnection();
 
+        $this->unsetStatsExpiry();
         $this->createTables();
         $this->truncateTables();
 
@@ -53,6 +54,44 @@ trait DatabaseTestTrait
     }
 
     /**
+     * Workaround for MySQL 8: update_time not working.
+     *
+     * https://bugs.mysql.com/bug.php?id=95407
+     *
+     * @return void
+     */
+    private function unsetStatsExpiry()
+    {
+        if (version_compare($this->getMySqlVersion(), '8.0.0') >= 0) {
+            $this->getConnection()->exec('SET information_schema_stats_expiry=0;');
+        }
+    }
+
+    /**
+     * Get MySql version.
+     *
+     * @throws UnexpectedValueException
+     *
+     * @return string The version
+     */
+    private function getMySqlVersion(): string
+    {
+        $statement = $this->getConnection()->query("SHOW VARIABLES LIKE 'version';");
+
+        if ($statement === false) {
+            throw new UnexpectedValueException('Invalid sql statement');
+        }
+
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
+
+        if ($row === false) {
+            throw new UnexpectedValueException('Version not found');
+        }
+
+        return (string)$row['Value'];
+    }
+
+    /**
      * Create tables.
      *
      * @return void
@@ -67,29 +106,6 @@ trait DatabaseTestTrait
         $this->importSchema();
 
         define('DB_TEST_TRAIT_INIT', 1);
-    }
-
-    /**
-     * Import table schema.
-     *
-     * @throws UnexpectedValueException
-     *
-     * @return void
-     */
-    protected function importSchema(): void
-    {
-        if (!$this->schemaFile) {
-            throw new UnexpectedValueException('The path for schema.sql is not defined');
-        }
-
-        if (!file_exists($this->schemaFile)) {
-            throw new UnexpectedValueException(sprintf('File not found: %s', $this->schemaFile));
-        }
-
-        $pdo = $this->getConnection();
-        $pdo->exec('SET unique_checks=0; SET foreign_key_checks=0;');
-        $pdo->exec((string)file_get_contents($this->schemaFile));
-        $pdo->exec('SET unique_checks=1; SET foreign_key_checks=1;');
     }
 
     /**
@@ -124,6 +140,49 @@ trait DatabaseTestTrait
     }
 
     /**
+     * Create PDO statement.
+     *
+     * @param string $sql The sql
+     *
+     * @throws UnexpectedValueException
+     *
+     * @return PDOStatement The statement
+     */
+    private function createQueryStatement(string $sql): PDOStatement
+    {
+        $statement = $this->getConnection()->query($sql, PDO::FETCH_ASSOC);
+
+        if (!$statement instanceof PDOStatement) {
+            throw new UnexpectedValueException('Invalid SQL statement');
+        }
+
+        return $statement;
+    }
+
+    /**
+     * Import table schema.
+     *
+     * @throws UnexpectedValueException
+     *
+     * @return void
+     */
+    protected function importSchema(): void
+    {
+        if (!$this->schemaFile) {
+            throw new UnexpectedValueException('The path for schema.sql is not defined');
+        }
+
+        if (!file_exists($this->schemaFile)) {
+            throw new UnexpectedValueException(sprintf('File not found: %s', $this->schemaFile));
+        }
+
+        $pdo = $this->getConnection();
+        $pdo->exec('SET unique_checks=0; SET foreign_key_checks=0;');
+        $pdo->exec((string)file_get_contents($this->schemaFile));
+        $pdo->exec('SET unique_checks=1; SET foreign_key_checks=1;');
+    }
+
+    /**
      * Clean up database.
      *
      * @throws UnexpectedValueException
@@ -134,7 +193,7 @@ trait DatabaseTestTrait
     {
         $pdo = $this->getConnection();
 
-        $pdo->exec('SET unique_checks=0; SET foreign_key_checks=0; SET information_schema_stats_expiry=0');
+        $pdo->exec('SET unique_checks=0; SET foreign_key_checks=0;');
 
         // Truncate only changed tables
         $statement = $this->createQueryStatement(
@@ -198,6 +257,26 @@ trait DatabaseTestTrait
     }
 
     /**
+     * Create PDO statement.
+     *
+     * @param string $sql The sql
+     *
+     * @throws UnexpectedValueException
+     *
+     * @return PDOStatement The statement
+     */
+    private function createPreparedStatement(string $sql): PDOStatement
+    {
+        $statement = $this->getConnection()->prepare($sql);
+
+        if (!$statement instanceof PDOStatement) {
+            throw new UnexpectedValueException('Invalid SQL statement');
+        }
+
+        return $statement;
+    }
+
+    /**
      * Asserts that a given table is the same as the given row.
      *
      * @param array<mixed> $expectedRow Row expected to find
@@ -220,6 +299,36 @@ trait DatabaseTestTrait
             $this->getTableRowById($table, $id, $fields ?: array_keys($expectedRow)),
             $message
         );
+    }
+
+    /**
+     * Fetch row by ID.
+     *
+     * @param string $table Table name
+     * @param int $id The primary key value
+     * @param array<mixed>|null $fields The array of fields
+     *
+     * @throws DomainException
+     *
+     * @return array<mixed> Row
+     */
+    protected function getTableRowById(string $table, int $id, array $fields = null): array
+    {
+        $sql = sprintf('SELECT * FROM `%s` WHERE `id` = :id', $table);
+        $statement = $this->createPreparedStatement($sql);
+        $statement->execute(['id' => $id]);
+
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
+
+        if (empty($row)) {
+            throw new DomainException(sprintf('Row not found: %s', $id));
+        }
+
+        if ($fields) {
+            $row = array_intersect_key($row, array_flip($fields));
+        }
+
+        return $row;
     }
 
     /**
@@ -284,17 +393,19 @@ trait DatabaseTestTrait
     }
 
     /**
-     * Asserts that a given table contains a given number of rows.
+     * Get table row count.
      *
-     * @param string $table Table to look into
-     * @param int $id The id
-     * @param string $message Optional message
+     * @param string $table The table name
      *
-     * @return void
+     * @return int The number of rows
      */
-    protected function assertTableRowExists(string $table, int $id, string $message = ''): void
+    protected function getTableRowCount(string $table): int
     {
-        $this->assertTrue((bool)$this->findTableRowById($table, $id), $message);
+        $sql = sprintf('SELECT COUNT(*) AS counter FROM `%s`;', $table);
+        $statement = $this->createQueryStatement($sql);
+        $row = $statement->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        return (int)($row['counter'] ?? 0);
     }
 
     /**
@@ -306,9 +417,9 @@ trait DatabaseTestTrait
      *
      * @return void
      */
-    protected function assertTableRowNotExists(string $table, int $id, string $message = ''): void
+    protected function assertTableRowExists(string $table, int $id, string $message = ''): void
     {
-        $this->assertFalse((bool)$this->findTableRowById($table, $id), $message);
+        $this->assertTrue((bool)$this->findTableRowById($table, $id), $message);
     }
 
     /**
@@ -331,88 +442,16 @@ trait DatabaseTestTrait
     }
 
     /**
-     * Fetch row by ID.
+     * Asserts that a given table contains a given number of rows.
      *
-     * @param string $table Table name
-     * @param int $id The primary key value
-     * @param array<mixed>|null $fields The array of fields
+     * @param string $table Table to look into
+     * @param int $id The id
+     * @param string $message Optional message
      *
-     * @throws DomainException
-     *
-     * @return array<mixed> Row
+     * @return void
      */
-    protected function getTableRowById(string $table, int $id, array $fields = null): array
+    protected function assertTableRowNotExists(string $table, int $id, string $message = ''): void
     {
-        $sql = sprintf('SELECT * FROM `%s` WHERE `id` = :id', $table);
-        $statement = $this->createPreparedStatement($sql);
-        $statement->execute(['id' => $id]);
-
-        $row = $statement->fetch(PDO::FETCH_ASSOC);
-
-        if (empty($row)) {
-            throw new DomainException(sprintf('Row not found: %s', $id));
-        }
-
-        if ($fields) {
-            $row = array_intersect_key($row, array_flip($fields));
-        }
-
-        return $row;
-    }
-
-    /**
-     * Get table row count.
-     *
-     * @param string $table The table name
-     *
-     * @return int The number of rows
-     */
-    protected function getTableRowCount(string $table): int
-    {
-        $sql = sprintf('SELECT COUNT(*) AS counter FROM `%s`;', $table);
-        $statement = $this->createQueryStatement($sql);
-        $row = $statement->fetch(PDO::FETCH_ASSOC) ?: [];
-
-        return (int)($row['counter'] ?? 0);
-    }
-
-    /**
-     * Create PDO statement.
-     *
-     * @param string $sql The sql
-     *
-     * @throws UnexpectedValueException
-     *
-     * @return PDOStatement The statement
-     */
-    private function createPreparedStatement(string $sql): PDOStatement
-    {
-        $statement = $this->getConnection()->prepare($sql);
-
-        if (!$statement instanceof PDOStatement) {
-            throw new UnexpectedValueException('Invalid SQL statement');
-        }
-
-        return $statement;
-    }
-
-    /**
-     * Create PDO statement.
-     *
-     * @param string $sql The sql
-     *
-     * @throws UnexpectedValueException
-     *
-     * @return PDOStatement The statement
-     */
-    private function createQueryStatement(string $sql): PDOStatement
-    {
-        $statement = $this->getConnection()->query($sql, PDO::FETCH_ASSOC);
-
-        if (!$statement instanceof PDOStatement) {
-            throw new UnexpectedValueException('Invalid SQL statement');
-        }
-
-        return $statement;
+        $this->assertFalse((bool)$this->findTableRowById($table, $id), $message);
     }
 }
