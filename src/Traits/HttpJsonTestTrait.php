@@ -37,7 +37,7 @@ trait HttpJsonTestTrait
     /**
      * Get JSON response as array.
      *
-     * @param ResponseInterface $response
+     * @param ResponseInterface $response The response
      *
      * @return array The data
      */

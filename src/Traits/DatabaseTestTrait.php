@@ -111,8 +111,6 @@ trait DatabaseTestTrait
     /**
      * Clean up database. Truncate tables.
      *
-     * @throws UnexpectedValueException
-     *
      * @return void
      */
     protected function dropTables(): void
@@ -184,8 +182,6 @@ trait DatabaseTestTrait
 
     /**
      * Clean up database.
-     *
-     * @throws UnexpectedValueException
      *
      * @return void
      */
@@ -427,8 +423,6 @@ trait DatabaseTestTrait
      *
      * @param string $table Table name
      * @param int $id The primary key value
-     *
-     * @throws DomainException
      *
      * @return array<mixed> Row
      */
