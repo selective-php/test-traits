@@ -2,7 +2,7 @@
 
 namespace Selective\TestTrait\Traits;
 
-use DI\Container;
+use Psr\Container\ContainerInterface;
 use UnexpectedValueException;
 
 /**
@@ -11,29 +11,29 @@ use UnexpectedValueException;
 trait ContainerTestTrait
 {
     /**
-     * @var Container
+     * @var ContainerInterface
      */
     protected $container;
 
     /**
-     * Bootstrap app.
+     * Setup DI container.
      *
      * TestCases must call this method inside setUp().
      *
-     * @param Container|null $container The container
+     * @param ContainerInterface|null $container The container
      *
      * @throws UnexpectedValueException
      *
      * @return void
      */
-    protected function setUpContainer(Container $container = null): void
+    protected function setUpContainer(ContainerInterface $container = null): void
     {
-        if ($container instanceof Container) {
+        if ($container instanceof ContainerInterface) {
             $this->container = $container;
 
             return;
         }
 
-        throw new UnexpectedValueException('Container must be instance of DI\Container');
+        throw new UnexpectedValueException('Container must be initialized');
     }
 }
