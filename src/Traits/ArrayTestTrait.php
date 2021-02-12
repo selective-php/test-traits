@@ -18,23 +18,22 @@ trait ArrayTestTrait
      */
     protected function getArrayValue(array $data, string $path, $default = null)
     {
-        $parts = explode('.', $path);
+        $currentValue = $data;
+        $keyPaths = (array)explode('.', $path);
 
-        switch (count($parts)) {
-            case 1:
-                return isset($data[$parts[0]]) ? $data[$parts[0]] : $default;
-            case 2:
-                return isset($data[$parts[0]][$parts[1]]) ? $data[$parts[0]][$parts[1]] : $default;
-            case 3:
-                return isset($data[$parts[0]][$parts[1]][$parts[2]]) ? $data[$parts[0]][$parts[1]][$parts[2]] : $default;
-            default:
-                foreach ($parts as $key) {
-                    if ((is_array($data)) && isset($data[$key])) {
-                        $data = $data[$key];
-                    } else {
-                        return $default;
-                    }
-                }
+        foreach ($keyPaths as $currentKey) {
+            if (isset($currentValue->$currentKey)) {
+                $currentValue = $currentValue->$currentKey;
+                continue;
+            }
+            if (isset($currentValue[$currentKey])) {
+                $currentValue = $currentValue[$currentKey];
+                continue;
+            }
+
+            return $default;
         }
+
+        return $currentValue === null ? $default : $currentValue;
     }
 }
