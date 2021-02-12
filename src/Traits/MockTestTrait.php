@@ -2,9 +2,9 @@
 
 namespace Selective\TestTrait\Traits;
 
-use DI\Container;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Container\ContainerInterface;
 
 /**
  * Mock Test Trait.
@@ -30,7 +30,7 @@ trait MockTestTrait
             ->disableOriginalConstructor()
             ->getMock();
 
-        if ($this->container instanceof Container) {
+        if ($this->container instanceof ContainerInterface && method_exists($this->container, 'set')) {
             $this->container->set($class, $mock);
         }
 
