@@ -44,10 +44,10 @@ trait HttpTestTrait
 
         return $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
     }
-    
+
     /**
-     * Build the path for a named route including the base path
-     * 
+     * Build the path for a named route including the base path.
+     *
      * @param string $routeName Route name
      * @param string[] $data Named argument replacement data
      * @param string[] $queryParams Optional query string parameters
