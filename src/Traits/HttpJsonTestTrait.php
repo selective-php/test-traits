@@ -8,12 +8,11 @@ use Psr\Http\Message\UriInterface;
 
 /**
  * HTTP JSON Test Trait.
+ *
+ * Requires: HttpTestTrait, ArrayTestTrait
  */
 trait HttpJsonTestTrait
 {
-    use HttpTestTrait;
-    use ArrayTestTrait;
-
     /**
      * Create a JSON request.
      *
@@ -35,6 +34,19 @@ trait HttpJsonTestTrait
     }
 
     /**
+     * Verify that the specified array is an exact match for the returned JSON.
+     *
+     * @param array<mixed> $expected The expected array
+     * @param ResponseInterface $response The response
+     *
+     * @return void
+     */
+    protected function assertJsonData(array $expected, ResponseInterface $response): void
+    {
+        $this->assertSame($expected, $this->getJsonData($response));
+    }
+
+    /**
      * Get JSON response as array.
      *
      * @param ResponseInterface $response The response
@@ -47,19 +59,6 @@ trait HttpJsonTestTrait
         $this->assertJson($actual);
 
         return (array)json_decode($actual, true);
-    }
-
-    /**
-     * Verify that the specified array is an exact match for the returned JSON.
-     *
-     * @param array<mixed> $expected The expected array
-     * @param ResponseInterface $response The response
-     *
-     * @return void
-     */
-    protected function assertJsonData(array $expected, ResponseInterface $response): void
-    {
-        $this->assertSame($expected, $this->getJsonData($response));
     }
 
     /**
