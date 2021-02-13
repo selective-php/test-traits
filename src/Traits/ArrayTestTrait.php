@@ -14,7 +14,7 @@ trait ArrayTestTrait
      * @param string $path The path
      * @param null $default The default return value#
      *
-     * @return mixed|null The value from the array or the default value
+     * @return mixed The value from the array or the default value
      */
     protected function getArrayValue(array $data, string $path, $default = null)
     {
