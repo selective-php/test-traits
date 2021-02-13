@@ -52,6 +52,8 @@ trait ContainerTestTrait
     {
         if (method_exists($this->container, 'set')) {
             $this->container->set($name, $value);
+
+            return;
         }
 
         throw new BadMethodCallException('This DI container does not support this feature');
