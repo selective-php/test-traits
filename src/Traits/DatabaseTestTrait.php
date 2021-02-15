@@ -62,30 +62,32 @@ trait DatabaseTestTrait
      */
     private function unsetStatsExpiry()
     {
-        if (version_compare($this->getMySqlVersion(), '8.0.0') >= 0) {
+        $isMySql = strpos($this->getDatabaseVariable('version_comment'), 'MySQL') !== false;
+        $version = $this->getDatabaseVariable('version');
+
+        if ($isMySql && version_compare($version, '8.0.0') >= 0) {
             $this->getConnection()->exec('SET information_schema_stats_expiry=0;');
         }
     }
 
     /**
-     * Get MySql version.
+     * Get database variable.
      *
-     * @throws UnexpectedValueException
+     * @param string $variable The variable
      *
-     * @return string The version
+     * @return string The value
      */
-    private function getMySqlVersion(): string
+    protected function getDatabaseVariable(string $variable): string
     {
-        $statement = $this->getConnection()->query("SHOW VARIABLES LIKE 'version';");
-
-        if ($statement === false) {
-            throw new UnexpectedValueException('Invalid sql statement');
+        $statement = $this->getConnection()->prepare('SHOW VARIABLES LIKE ?');
+        if (!$statement || $statement->execute([$variable]) === false) {
+            throw new UnexpectedValueException('Invalid SQL statement');
         }
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($row === false) {
-            throw new UnexpectedValueException('Version not found');
+            throw new UnexpectedValueException(sprintf('Database variable not defined: %s', $variable));
         }
 
         return (string)$row['Value'];
