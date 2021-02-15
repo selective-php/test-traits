@@ -41,8 +41,8 @@ trait ContainerTestTrait
     /**
      * Define an object or a value in the container.
      *
-     * @param string $name Entry name
-     * @param mixed $value Value, use definition helpers to define objects
+     * @param string $name The entry name
+     * @param mixed $value The value
      *
      * @throws BadMethodCallException
      *
