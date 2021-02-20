@@ -79,10 +79,10 @@ trait DatabaseTestTrait
      */
     private function unsetStatsExpiry()
     {
-        $isMariaDb = strpos($this->getDatabaseVariable('version_comment'), 'MariaDB') !== false;
-        $version = $this->getDatabaseVariable('version');
+        $expiry = $this->getDatabaseVariable('information_schema_stats_expiry');
+        $version = (string)$this->getDatabaseVariable('version');
 
-        if (!$isMariaDb && version_compare($version, '8.0.0', '>=') && version_compare($version, '10.0.0', '<')) {
+        if ($expiry !== null && version_compare($version, '8.0.0', '>=')) {
             $this->getConnection()->exec('SET information_schema_stats_expiry=0;');
         }
     }
@@ -92,9 +92,9 @@ trait DatabaseTestTrait
      *
      * @param string $variable The variable
      *
-     * @return string The value
+     * @return string|null The value
      */
-    protected function getDatabaseVariable(string $variable): string
+    protected function getDatabaseVariable(string $variable): ?string
     {
         $statement = $this->getConnection()->prepare('SHOW VARIABLES LIKE ?');
         if (!$statement || $statement->execute([$variable]) === false) {
@@ -104,7 +104,8 @@ trait DatabaseTestTrait
         $row = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($row === false) {
-            throw new UnexpectedValueException(sprintf('Database variable not defined: %s', $variable));
+            // Database variable not defined
+            return null;
         }
 
         return (string)$row['Value'];
