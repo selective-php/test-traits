@@ -34,7 +34,6 @@ trait DatabaseTestTrait
 
         $this->getConnection();
 
-        $this->unsetStatsExpiry();
         $this->createTables();
         $this->truncateTables();
 
@@ -54,6 +53,24 @@ trait DatabaseTestTrait
     }
 
     /**
+     * Create tables.
+     *
+     * @return void
+     */
+    protected function createTables(): void
+    {
+        if (defined('DB_TEST_TRAIT_INIT')) {
+            return;
+        }
+
+        $this->unsetStatsExpiry();
+        $this->dropTables();
+        $this->importSchema();
+
+        define('DB_TEST_TRAIT_INIT', 1);
+    }
+
+    /**
      * Workaround for MySQL 8: update_time not working.
      *
      * https://bugs.mysql.com/bug.php?id=95407
@@ -62,10 +79,10 @@ trait DatabaseTestTrait
      */
     private function unsetStatsExpiry()
     {
-        $isMySql = strpos($this->getDatabaseVariable('version_comment'), 'MySQL') !== false;
+        $isMariaDb = strpos($this->getDatabaseVariable('version_comment'), 'MariaDB') !== false;
         $version = $this->getDatabaseVariable('version');
 
-        if ($isMySql && version_compare($version, '8.0.0') >= 0) {
+        if (!$isMariaDb && version_compare($version, '8.0.0', '>=') && version_compare($version, '10.0.0', '<')) {
             $this->getConnection()->exec('SET information_schema_stats_expiry=0;');
         }
     }
@@ -91,23 +108,6 @@ trait DatabaseTestTrait
         }
 
         return (string)$row['Value'];
-    }
-
-    /**
-     * Create tables.
-     *
-     * @return void
-     */
-    protected function createTables(): void
-    {
-        if (defined('DB_TEST_TRAIT_INIT')) {
-            return;
-        }
-
-        $this->dropTables();
-        $this->importSchema();
-
-        define('DB_TEST_TRAIT_INIT', 1);
     }
 
     /**
