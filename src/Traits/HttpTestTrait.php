@@ -2,9 +2,13 @@
 
 namespace Selective\TestTrait\Traits;
 
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
-use Slim\Psr7\Factory\ServerRequestFactory;
+use RuntimeException;
 
 /**
  * HTTP Test Trait.
@@ -18,11 +22,19 @@ trait HttpTestTrait
      * @param string|UriInterface $uri The URI
      * @param array<mixed> $serverParams The server parameters
      *
+     * @throws RuntimeException
+     *
      * @return ServerRequestInterface The request
      */
     protected function createRequest(string $method, $uri, array $serverParams = []): ServerRequestInterface
     {
-        return (new ServerRequestFactory())->createServerRequest($method, $uri, $serverParams);
+        if (!$this->container instanceof ContainerInterface) {
+            throw new RuntimeException('DI container not found');
+        }
+
+        $factory = $this->container->get(ServerRequestFactoryInterface::class);
+
+        return $factory->createServerRequest($method, $uri, $serverParams);
     }
 
     /**
@@ -32,7 +44,7 @@ trait HttpTestTrait
      * @param string|UriInterface $uri The URI
      * @param array<mixed>|null $data The form data
      *
-     * @return ServerRequestInterface
+     * @return ServerRequestInterface The request
      */
     protected function createFormRequest(string $method, $uri, array $data = null): ServerRequestInterface
     {
@@ -43,5 +55,26 @@ trait HttpTestTrait
         }
 
         return $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+    }
+
+    /**
+     * Create a new response.
+     *
+     * @param int $code HTTP status code; defaults to 200
+     * @param string $reasonPhrase Reason phrase to associate with status code
+     *
+     * @throws RuntimeException
+     *
+     * @return ResponseInterface The response
+     */
+    protected function createResponse(int $code = 200, string $reasonPhrase = ''): ResponseInterface
+    {
+        if (!$this->container instanceof ContainerInterface) {
+            throw new RuntimeException('DI container not found');
+        }
+
+        $factory = $this->container->get(ResponseFactoryInterface::class);
+
+        return $factory->createResponse($code, $reasonPhrase);
     }
 }
