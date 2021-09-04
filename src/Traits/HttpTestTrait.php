@@ -20,7 +20,7 @@ trait HttpTestTrait
      *
      * @param string $method The HTTP method
      * @param string|UriInterface $uri The URI
-     * @param array<mixed> $serverParams The server parameters
+     * @param array $serverParams The server parameters
      *
      * @throws RuntimeException
      *
@@ -42,7 +42,7 @@ trait HttpTestTrait
      *
      * @param string $method The HTTP method
      * @param string|UriInterface $uri The URI
-     * @param array<mixed>|null $data The form data
+     * @param array|null $data The form data
      *
      * @return ServerRequestInterface The request
      */

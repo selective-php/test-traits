@@ -18,7 +18,7 @@ trait HttpJsonTestTrait
      *
      * @param string $method The HTTP method
      * @param string|UriInterface $uri The URI
-     * @param array<mixed>|null $data The json data
+     * @param array|null $data The json data
      *
      * @return ServerRequestInterface
      */
@@ -36,7 +36,7 @@ trait HttpJsonTestTrait
     /**
      * Verify that the specified array is an exact match for the returned JSON.
      *
-     * @param array<mixed> $expected The expected array
+     * @param array $expected The expected array
      * @param ResponseInterface $response The response
      *
      * @return void
