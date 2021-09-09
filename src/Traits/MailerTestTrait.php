@@ -115,6 +115,8 @@ trait MailerTestTrait
     }
 
     /**
+     * @param string|null $transport
+     *
      * @return MessageEvents[]
      */
     protected function getMailerEvents(string $transport = null): array
@@ -128,6 +130,8 @@ trait MailerTestTrait
     }
 
     /**
+     * @param string|null $transport
+     *
      * @return RawMessage[]
      */
     protected function getMailerMessages(string $transport = null): array
@@ -156,7 +160,7 @@ trait MailerTestTrait
                 return $listenerInstance->getEvents();
             }
         }
-    
+
         throw new RuntimeException('The Mailer event dispatcher must be enabled to make email assertions.');
     }
 }
