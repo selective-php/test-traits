@@ -18,9 +18,11 @@ A collection of PHPUnit test traits.
 composer require selective/test-traits --dev
 ```
 
+## Traits
+
 ### MailerTestTrait
 
-Requirements: `symfony/mailer`
+Requirements: `composer require symfony/mailer`
 
 DI container setup example:
 
