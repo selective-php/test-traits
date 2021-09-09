@@ -27,7 +27,7 @@ trait HttpJsonTestTrait
         $request = $this->createRequest($method, $uri);
 
         if ($data !== null) {
-            $request = $request->withParsedBody($data);
+            $request->getBody()->write((string)json_encode($data));
         }
 
         return $request->withHeader('Content-Type', 'application/json');
