@@ -12,6 +12,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\EventListener\EnvelopeListener;
 use Symfony\Component\Mailer\EventListener\MessageListener;
 use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport;
@@ -23,7 +24,14 @@ final class MailerTestTraitTest extends TestCase
     use ContainerTestTrait;
     use MailerTestTrait;
 
-    public function testMailer()
+    /**
+     * Test.
+     *
+     * @throws TransportExceptionInterface
+     *
+     * @return void
+     */
+    public function testMailer(): void
     {
         $containerBuilder = new ContainerBuilder();
         $containerBuilder->addDefinitions(
