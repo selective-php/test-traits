@@ -78,28 +78,43 @@ return [
 
 **Usage**:
 
-PhpUnit test case:
+PHPUnit test case:
 
 ```php
+<?php
+
+namespace App\Test\TestCase;
+
+use PHPUnit\Framework\TestCase;
+use Selective\TestTrait\Traits\ContainerTestTrait;
+use Selective\TestTrait\Traits\MailerTestTrait;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
-// ...
 
-$mailer = $this->container->get(MailerInterface::class);
+final class MailerExampleTest extends TestCase
+{
+    use ContainerTestTrait;
+    use MailerTestTrait;
 
-// Send email
-$email = (new Email())
-    ->from('hello@example.com')
-    ->to('you@example.com')
-    ->subject('Time for Symfony Mailer!')
-    ->text('Sending emails is fun again!')
-    ->html('<p>My HTML content</p>');
+    public function testMailer(): void
+    {
+        $mailer = $this->container->get(MailerInterface::class);
 
-$mailer->send($email);
+        // Send email
+        $email = (new Email())
+            ->from('hello@example.com')
+            ->to('you@example.com')
+            ->subject('Time for Symfony Mailer!')
+            ->text('Sending emails is fun again!')
+            ->html('<p>My HTML content</p>');
 
-$this->assertEmailCount(1);
-$this->assertEmailTextBodyContains($this->getMailerMessage(), 'Sending emails is fun again!');
-$this->assertEmailHtmlBodyContains($this->getMailerMessage(), '<p>My HTML content</p>');
+        $mailer->send($email);
+
+        $this->assertEmailCount(1);
+        $this->assertEmailTextBodyContains($this->getMailerMessage(), 'Sending emails is fun again!');
+        $this->assertEmailHtmlBodyContains($this->getMailerMessage(), '<p>My HTML content</p>');
+    }
+}
 ```
 
 ## License
