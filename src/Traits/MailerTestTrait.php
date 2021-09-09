@@ -18,6 +18,7 @@ use Symfony\Component\Mime\Test\Constraint\EmailHasHeader;
 use Symfony\Component\Mime\Test\Constraint\EmailHeaderSame;
 use Symfony\Component\Mime\Test\Constraint\EmailHtmlBodyContains;
 use Symfony\Component\Mime\Test\Constraint\EmailTextBodyContains;
+use UnexpectedValueException;
 
 /**
  * Array Test Trait.
@@ -117,7 +118,7 @@ trait MailerTestTrait
     /**
      * @param string|null $transport
      *
-     * @return MessageEvents[]
+     * @return MessageEvent[]
      */
     protected function getMailerEvents(string $transport = null): array
     {
@@ -139,9 +140,20 @@ trait MailerTestTrait
         return $this->getMessageMailerEvents()->getMessages($transport);
     }
 
-    protected function getMailerMessage(int $index = 0, string $transport = null): ?RawMessage
+    protected function findMailerMessage(int $index = 0, string $transport = null): ?RawMessage
     {
         return $this->getMailerMessages($transport)[$index] ?? null;
+    }
+
+    protected function getMailerMessage(int $index = 0, string $transport = null): RawMessage
+    {
+        $message = $this->findMailerMessage($index, $transport);
+
+        if ($message === null) {
+            throw new UnexpectedValueException('The Mailer message was not found.');
+        }
+
+        return $message;
     }
 
     protected function getMessageMailerEvents(): MessageEvents
@@ -150,6 +162,7 @@ trait MailerTestTrait
 
         /** @var EventSubscriberInterface[] $listeners */
         foreach ($dispatcher->getListeners() as $listeners) {
+            /** @var array $listener */
             foreach ($listeners as $listener) {
                 $listenerInstance = $listener[0];
 
