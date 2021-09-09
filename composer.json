@@ -17,9 +17,11 @@
         "friendsofphp/php-cs-fixer": "^2",
         "monolog/monolog": "^2.3",
         "overtrue/phplint": "^2.3",
+        "php-di/php-di": "^6.3",
         "phpstan/phpstan": "0.*",
         "phpunit/phpunit": "^8 || ^9",
-        "squizlabs/php_codesniffer": "^3.5"
+        "squizlabs/php_codesniffer": "^3.5",
+        "symfony/mailer": "^5.3"
     },
     "config": {
         "sort-packages": true
