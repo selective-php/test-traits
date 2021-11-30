@@ -4,3 +4,7 @@ parameters:
 	paths:
 		- src
 		- tests
+	ignoreErrors:
+		- '#Cannot call method getListeners\(\) on mixed.#'
+		- '#Cannot call method send\(\) on mixed.#'
+		- '#Parameter \#1 \$transport of class Symfony\\Component\\Mailer\\Mailer constructor expects Symfony\\Component\\Mailer\\Transport\\TransportInterface, mixed given.#'
