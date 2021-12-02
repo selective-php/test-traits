@@ -38,7 +38,10 @@ final class MailerTestTraitTest extends TestCase
             [
                 // Mailer
                 MailerInterface::class => function (ContainerInterface $container) {
-                    return new Mailer($container->get(TransportInterface::class));
+                    /** @var TransportInterface $transport */
+                    $transport = $container->get(TransportInterface::class);
+
+                    return new Mailer($transport);
                 },
 
                 // Mailer transport
@@ -61,6 +64,7 @@ final class MailerTestTraitTest extends TestCase
 
         $this->setUpContainer($containerBuilder->build());
 
+        /** @var MailerInterface $mailer */
         $mailer = $this->container->get(MailerInterface::class);
 
         // Send email

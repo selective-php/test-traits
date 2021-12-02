@@ -158,6 +158,7 @@ trait MailerTestTrait
 
     protected function getMessageMailerEvents(): MessageEvents
     {
+        /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->container->get(EventDispatcherInterface::class);
 
         /** @var EventSubscriberInterface[] $listeners */
