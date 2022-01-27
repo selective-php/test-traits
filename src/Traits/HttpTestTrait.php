@@ -77,4 +77,19 @@ trait HttpTestTrait
 
         return $factory->createResponse($code, $reasonPhrase);
     }
+
+    /**
+     * Assert that the response body contains a string.
+     *
+     * @param ResponseInterface $response The response
+     * @param string $needle The expected string
+     *
+     * @return void
+     */
+    protected function assertResponseContains(ResponseInterface $response, string $needle)
+    {
+        $body = (string)$response->getBody();
+
+        $this->assertStringContainsString($needle, $body);
+    }
 }
