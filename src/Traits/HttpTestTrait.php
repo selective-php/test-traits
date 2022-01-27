@@ -86,7 +86,7 @@ trait HttpTestTrait
      *
      * @return void
      */
-    protected function assertResponseContains(ResponseInterface $response, string $needle)
+    protected function assertResponseContains(ResponseInterface $response, string $needle): void
     {
         $body = (string)$response->getBody();
 
