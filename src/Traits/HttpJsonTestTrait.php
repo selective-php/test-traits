@@ -43,10 +43,9 @@ trait HttpJsonTestTrait
      */
     protected function assertJsonData(array $expected, ResponseInterface $response): void
     {
-        $this->assertSame(
-            var_export($expected, true),
-            var_export($this->getJsonData($response), true)
-        );
+        $data = $this->getJsonData($response);
+
+        $this->assertSame($expected, $data);
     }
 
     /**
@@ -87,9 +86,6 @@ trait HttpJsonTestTrait
      */
     protected function assertJsonValue($expected, string $path, ResponseInterface $response)
     {
-        $this->assertSame(
-            var_export($expected, true),
-            var_export($this->getArrayValue($this->getJsonData($response), $path), true)
-        );
+        $this->assertSame($expected, $this->getArrayValue($this->getJsonData($response), $path));
     }
 }
