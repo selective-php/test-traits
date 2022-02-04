@@ -63,28 +63,10 @@ trait DatabaseTestTrait
             return;
         }
 
-        $this->unsetStatsExpiry();
         $this->dropTables();
         $this->importSchema();
 
         define('DB_TEST_TRAIT_INIT', 1);
-    }
-
-    /**
-     * Workaround for MySQL 8: update_time not working.
-     *
-     * https://bugs.mysql.com/bug.php?id=95407
-     *
-     * @return void
-     */
-    private function unsetStatsExpiry()
-    {
-        $expiry = $this->getDatabaseVariable('information_schema_stats_expiry');
-        $version = (string)$this->getDatabaseVariable('version');
-
-        if ($expiry !== null && version_compare($version, '8.0.0', '>=')) {
-            $this->getConnection()->exec('SET information_schema_stats_expiry=0;');
-        }
     }
 
     /**
@@ -196,13 +178,24 @@ trait DatabaseTestTrait
 
         $pdo->exec('SET unique_checks=0; SET foreign_key_checks=0;');
 
-        // Truncate only changed tables
-        $statement = $this->createQueryStatement(
-            'SELECT TABLE_NAME
+        $expiry = $this->getDatabaseVariable('information_schema_stats_expiry');
+        if ($expiry === null) {
+            // MariaDB: Truncate only changed tables
+            $statement = $this->createQueryStatement(
+                'SELECT TABLE_NAME
                 FROM information_schema.tables
                 WHERE table_schema = database()
-                AND update_time IS NOT NULL'
-        );
+                AND (update_time IS NOT NULL OR auto_increment IS NOT NULL)'
+            );
+        } else {
+            // MySQL: Truncate all tables
+            // Workaround for MySQL 8: update_time not working.
+            // Even SET information_schema_stats_expiry=0; has no affect anymore.
+            // https://bugs.mysql.com/bug.php?id=95407
+            $statement = $this->createQueryStatement(
+                'SELECT TABLE_NAME FROM information_schema.tables WHERE table_schema = database()'
+            );
+        }
 
         $rows = (array)$statement->fetchAll(PDO::FETCH_ASSOC);
 
