@@ -128,8 +128,10 @@ trait DatabaseTestTrait
                 WHERE table_schema = database()'
         );
 
+        $rows = (array)$statement->fetchAll(PDO::FETCH_ASSOC);
+
         $sql = [];
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+        foreach ($rows as $row) {
             $sql[] = sprintf('DROP TABLE `%s`;', $row['TABLE_NAME']);
         }
 
@@ -202,8 +204,10 @@ trait DatabaseTestTrait
                 AND update_time IS NOT NULL'
         );
 
+        $rows = (array)$statement->fetchAll(PDO::FETCH_ASSOC);
+
         $sql = [];
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+        foreach ($rows as $row) {
             $sql[] = sprintf('TRUNCATE TABLE `%s`;', $row['TABLE_NAME']);
         }
 
