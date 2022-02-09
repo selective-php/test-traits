@@ -117,6 +117,76 @@ final class MailerExampleTest extends TestCase
 }
 ```
 
+### HttpTestTrait
+
+```php
+<?php
+
+namespace App\Test\TestCase;
+
+use PHPUnit\Framework\TestCase;
+use Selective\TestTrait\Traits\ContainerTestTrait;
+use Selective\TestTrait\Traits\HttpTestTrait;
+
+class GetUsersTestAction extends TestCase
+{
+    use ContainerTestTrait;
+    use HttpTestTrait;
+     
+    public function test(): void
+    {
+        $request = $this->createRequest('GET', '/api/users');
+        $response = $this->app->handle($request);
+        $this->assertSame(200, $response->getStatusCode());
+    }
+}
+```
+
+Creating a request with query string parameters:
+
+```php
+$request = $this->createRequest('GET', '/api/users')
+    ->withQueryParams($queryParams);
+```
+
+## RouteTestTrait
+
+Requirements: `composer require slim/slim`
+
+Usage examples
+
+```php
+<?php
+
+namespace App\Test\TestCase;
+
+use PHPUnit\Framework\TestCase;
+use Selective\TestTrait\Traits\ContainerTestTrait;
+use Selective\TestTrait\Traits\HttpTestTrait;
+use Selective\TestTrait\Traits\RouteTestTrait;
+
+class GetUsersTestAction extends TestCase
+{
+    use ContainerTestTrait;
+    use HttpTestTrait;
+    use RouteTestTrait;
+     
+    public function test(): void
+    {
+        $request = $this->createRequest('GET', $this->urlFor('get-users'));
+        $response = $this->app->handle($request);
+        $this->assertSame(200, $response->getStatusCode());
+    }
+}
+```
+
+Creating a request with a named route and query string parameters:
+
+```php
+$request = $this->createRequest('GET',  $this->urlFor('get-users'))
+    ->withQueryParams($queryParams);
+```
+
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE) for more information.
