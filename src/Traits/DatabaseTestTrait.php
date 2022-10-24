@@ -235,9 +235,9 @@ trait DatabaseTestTrait
      * @param string $table The table name
      * @param array $row The row data
      *
-     * @return void
+     * @return string|null
      */
-    protected function insertFixture(string $table, array $row): void
+    protected function insertFixture(string $table, array $row): ?string
     {
         $fields = array_keys($row);
 
@@ -250,6 +250,7 @@ trait DatabaseTestTrait
 
         $statement = $this->createPreparedStatement(sprintf('INSERT INTO `%s` SET %s', $table, implode(',', $fields)));
         $statement->execute($row);
+        return $this->getConnection()->lastInsertId() ?: null;
     }
 
     /**
