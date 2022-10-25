@@ -253,8 +253,9 @@ trait DatabaseTestTrait
         $statement->execute($row);
 
         try {
-            return (int)$this->getConnection()->lastInsertId();
-        } catch (PDOException $PDOException){
+            $lastInsertId = $this->getConnection()->lastInsertId();
+            return !empty($lastInsertId) && is_numeric($lastInsertId) ? (int)$lastInsertId : null;
+        } catch (PDOException $PDOException) {
             // If the PDO driver does not support this capability
             return null;
         }
