@@ -4,6 +4,7 @@ namespace Selective\TestTrait\Traits;
 
 use DomainException;
 use PDO;
+use PDOException;
 use PDOStatement;
 use UnexpectedValueException;
 
@@ -235,9 +236,9 @@ trait DatabaseTestTrait
      * @param string $table The table name
      * @param array $row The row data
      *
-     * @return string|null
+     * @return int|null last insert id of auto increment column otherwise null
      */
-    protected function insertFixture(string $table, array $row): ?string
+    protected function insertFixture(string $table, array $row): ?int
     {
         $fields = array_keys($row);
 
@@ -250,7 +251,13 @@ trait DatabaseTestTrait
 
         $statement = $this->createPreparedStatement(sprintf('INSERT INTO `%s` SET %s', $table, implode(',', $fields)));
         $statement->execute($row);
-        return $this->getConnection()->lastInsertId() ?: null;
+
+        try {
+            return (int)$this->getConnection()->lastInsertId();
+        } catch (PDOException $PDOException){
+            // If the PDO driver does not support this capability
+            return null;
+        }
     }
 
     /**
