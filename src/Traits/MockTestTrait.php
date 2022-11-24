@@ -2,7 +2,6 @@
 
 namespace Selective\TestTrait\Traits;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface;
 
@@ -16,14 +15,14 @@ trait MockTestTrait
      *
      * @param string $class The class or interface
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      *
      * @return MockObject The mock
      */
     protected function mock(string $class): MockObject
     {
         if (!class_exists($class)) {
-            throw new InvalidArgumentException(sprintf('Class not found: %s', $class));
+            throw new \InvalidArgumentException(sprintf('Class not found: %s', $class));
         }
 
         $mock = $this->getMockBuilder($class)

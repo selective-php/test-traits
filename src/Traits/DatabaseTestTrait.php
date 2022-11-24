@@ -2,10 +2,7 @@
 
 namespace Selective\TestTrait\Traits;
 
-use DomainException;
 use PDO;
-use PDOStatement;
-use UnexpectedValueException;
 
 /**
  * Database test.
@@ -45,11 +42,11 @@ trait DatabaseTestTrait
     /**
      * Get database connection.
      *
-     * @return PDO The PDO instance
+     * @return \PDO The PDO instance
      */
-    protected function getConnection(): PDO
+    protected function getConnection(): \PDO
     {
-        return $this->container->get(PDO::class);
+        return $this->container->get(\PDO::class);
     }
 
     /**
@@ -80,10 +77,10 @@ trait DatabaseTestTrait
     {
         $statement = $this->getConnection()->prepare('SHOW VARIABLES LIKE ?');
         if (!$statement || $statement->execute([$variable]) === false) {
-            throw new UnexpectedValueException('Invalid SQL statement');
+            throw new \UnexpectedValueException('Invalid SQL statement');
         }
 
-        $row = $statement->fetch(PDO::FETCH_ASSOC);
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
         if ($row === false) {
             // Database variable not defined
@@ -110,7 +107,7 @@ trait DatabaseTestTrait
                 WHERE table_schema = database()'
         );
 
-        $rows = (array)$statement->fetchAll(PDO::FETCH_ASSOC);
+        $rows = (array)$statement->fetchAll(\PDO::FETCH_ASSOC);
 
         $sql = [];
         foreach ($rows as $row) {
@@ -129,16 +126,16 @@ trait DatabaseTestTrait
      *
      * @param string $sql The sql
      *
-     * @throws UnexpectedValueException
+     * @throws \UnexpectedValueException
      *
-     * @return PDOStatement The statement
+     * @return \PDOStatement The statement
      */
-    private function createQueryStatement(string $sql): PDOStatement
+    private function createQueryStatement(string $sql): \PDOStatement
     {
-        $statement = $this->getConnection()->query($sql, PDO::FETCH_ASSOC);
+        $statement = $this->getConnection()->query($sql, \PDO::FETCH_ASSOC);
 
-        if (!$statement instanceof PDOStatement) {
-            throw new UnexpectedValueException('Invalid SQL statement');
+        if (!$statement instanceof \PDOStatement) {
+            throw new \UnexpectedValueException('Invalid SQL statement');
         }
 
         return $statement;
@@ -147,18 +144,18 @@ trait DatabaseTestTrait
     /**
      * Import table schema.
      *
-     * @throws UnexpectedValueException
+     * @throws \UnexpectedValueException
      *
      * @return void
      */
     protected function importSchema(): void
     {
         if (!$this->schemaFile) {
-            throw new UnexpectedValueException('The path for schema.sql is not defined');
+            throw new \UnexpectedValueException('The path for schema.sql is not defined');
         }
 
         if (!file_exists($this->schemaFile)) {
-            throw new UnexpectedValueException(sprintf('File not found: %s', $this->schemaFile));
+            throw new \UnexpectedValueException(sprintf('File not found: %s', $this->schemaFile));
         }
 
         $pdo = $this->getConnection();
@@ -197,7 +194,7 @@ trait DatabaseTestTrait
             );
         }
 
-        $rows = (array)$statement->fetchAll(PDO::FETCH_ASSOC);
+        $rows = (array)$statement->fetchAll(\PDO::FETCH_ASSOC);
 
         $sql = [];
         foreach ($rows as $row) {
@@ -257,16 +254,16 @@ trait DatabaseTestTrait
      *
      * @param string $sql The sql
      *
-     * @throws UnexpectedValueException
+     * @throws \UnexpectedValueException
      *
-     * @return PDOStatement The statement
+     * @return \PDOStatement The statement
      */
-    private function createPreparedStatement(string $sql): PDOStatement
+    private function createPreparedStatement(string $sql): \PDOStatement
     {
         $statement = $this->getConnection()->prepare($sql);
 
-        if (!$statement instanceof PDOStatement) {
-            throw new UnexpectedValueException('Invalid SQL statement');
+        if (!$statement instanceof \PDOStatement) {
+            throw new \UnexpectedValueException('Invalid SQL statement');
         }
 
         return $statement;
@@ -304,7 +301,7 @@ trait DatabaseTestTrait
      * @param int $id The primary key value
      * @param array|null $fields The array of fields
      *
-     * @throws DomainException
+     * @throws \DomainException
      *
      * @return array Row
      */
@@ -314,10 +311,10 @@ trait DatabaseTestTrait
         $statement = $this->createPreparedStatement($sql);
         $statement->execute(['id' => $id]);
 
-        $row = $statement->fetch(PDO::FETCH_ASSOC);
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
         if (empty($row)) {
-            throw new DomainException(sprintf('Row not found: %s', $id));
+            throw new \DomainException(sprintf('Row not found: %s', $id));
         }
 
         if ($fields) {
@@ -399,7 +396,7 @@ trait DatabaseTestTrait
     {
         $sql = sprintf('SELECT COUNT(*) AS counter FROM `%s`;', $table);
         $statement = $this->createQueryStatement($sql);
-        $row = $statement->fetch(PDO::FETCH_ASSOC) ?: [];
+        $row = $statement->fetch(\PDO::FETCH_ASSOC) ?: [];
 
         return (int)($row['counter'] ?? 0);
     }
@@ -432,7 +429,7 @@ trait DatabaseTestTrait
         $statement = $this->createPreparedStatement($sql);
         $statement->execute(['id' => $id]);
 
-        return $statement->fetch(PDO::FETCH_ASSOC) ?: [];
+        return $statement->fetch(\PDO::FETCH_ASSOC) ?: [];
     }
 
     /**

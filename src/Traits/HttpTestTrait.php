@@ -8,7 +8,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
-use RuntimeException;
 
 /**
  * HTTP Test Trait.
@@ -22,14 +21,14 @@ trait HttpTestTrait
      * @param string|UriInterface $uri The URI
      * @param array $serverParams The server parameters
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      *
      * @return ServerRequestInterface The request
      */
     protected function createRequest(string $method, $uri, array $serverParams = []): ServerRequestInterface
     {
         if (!$this->container instanceof ContainerInterface) {
-            throw new RuntimeException('DI container not found');
+            throw new \RuntimeException('DI container not found');
         }
 
         $factory = $this->container->get(ServerRequestFactoryInterface::class);
@@ -63,14 +62,14 @@ trait HttpTestTrait
      * @param int $code HTTP status code; defaults to 200
      * @param string $reasonPhrase Reason phrase to associate with status code
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      *
      * @return ResponseInterface The response
      */
     protected function createResponse(int $code = 200, string $reasonPhrase = ''): ResponseInterface
     {
         if (!$this->container instanceof ContainerInterface) {
-            throw new RuntimeException('DI container not found');
+            throw new \RuntimeException('DI container not found');
         }
 
         $factory = $this->container->get(ResponseFactoryInterface::class);

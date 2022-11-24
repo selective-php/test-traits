@@ -3,7 +3,6 @@
 namespace Selective\TestTrait\Traits;
 
 use PHPUnit\Framework\Constraint\LogicalNot;
-use RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\Event\MessageEvent;
@@ -18,7 +17,6 @@ use Symfony\Component\Mime\Test\Constraint\EmailHasHeader;
 use Symfony\Component\Mime\Test\Constraint\EmailHeaderSame;
 use Symfony\Component\Mime\Test\Constraint\EmailHtmlBodyContains;
 use Symfony\Component\Mime\Test\Constraint\EmailTextBodyContains;
-use UnexpectedValueException;
 
 /**
  * Array Test Trait.
@@ -150,7 +148,7 @@ trait MailerTestTrait
         $message = $this->findMailerMessage($index, $transport);
 
         if ($message === null) {
-            throw new UnexpectedValueException('The Mailer message was not found.');
+            throw new \UnexpectedValueException('The Mailer message was not found.');
         }
 
         return $message;
@@ -175,6 +173,6 @@ trait MailerTestTrait
             }
         }
 
-        throw new RuntimeException('The Mailer event dispatcher must be enabled to make email assertions.');
+        throw new \RuntimeException('The Mailer event dispatcher must be enabled to make email assertions.');
     }
 }

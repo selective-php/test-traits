@@ -2,9 +2,7 @@
 
 namespace Selective\TestTrait\Traits;
 
-use BadMethodCallException;
 use Psr\Container\ContainerInterface;
-use UnexpectedValueException;
 
 /**
  * Container Test Trait.
@@ -23,7 +21,7 @@ trait ContainerTestTrait
      *
      * @param ContainerInterface|null $container The container
      *
-     * @throws UnexpectedValueException
+     * @throws \UnexpectedValueException
      *
      * @return void
      */
@@ -35,7 +33,7 @@ trait ContainerTestTrait
             return;
         }
 
-        throw new UnexpectedValueException('Container must be initialized');
+        throw new \UnexpectedValueException('Container must be initialized');
     }
 
     /**
@@ -44,7 +42,7 @@ trait ContainerTestTrait
      * @param string $name The entry name
      * @param mixed $value The value
      *
-     * @throws BadMethodCallException
+     * @throws \BadMethodCallException
      *
      * @return void
      */
@@ -56,6 +54,6 @@ trait ContainerTestTrait
             return;
         }
 
-        throw new BadMethodCallException('This DI container does not support this feature');
+        throw new \BadMethodCallException('This DI container does not support this feature');
     }
 }
