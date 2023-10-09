@@ -119,6 +119,23 @@ final class MailerExampleTest extends TestCase
 
 ### HttpTestTrait
 
+Requirements
+
+* Any PSR-7 and PSR-17 factory implementation.
+
+```
+composer require nyholm/psr7-server
+composer require nyholm/psr7
+```
+
+**Provided methods**
+
+* `createRequest(string $method, $uri, array $serverParams = []): ServerRequestInterface`
+* `createFormRequest(string $method, $uri, array $data = null): ServerRequestInterface`
+* `createResponse(int $code = 200, string $reasonPhrase = ''): ResponseInterface`
+
+**Usage**
+
 ```php
 <?php
 
@@ -151,9 +168,17 @@ $request = $this->createRequest('GET', '/api/users')
 
 ## RouteTestTrait
 
-Requirements: `composer require slim/slim`
+A Slim 4 framework router test trait.
 
-Usage examples
+Requirements
+
+* A Slim 4 framework application
+
+**Provided methods:**
+
+* `urlFor(string $routeName, array $data = [], array $queryParams = []): string`
+
+**Usage:**
 
 ```php
 <?php
@@ -165,7 +190,7 @@ use Selective\TestTrait\Traits\ContainerTestTrait;
 use Selective\TestTrait\Traits\HttpTestTrait;
 use Selective\TestTrait\Traits\RouteTestTrait;
 
-class GetUsersTestAction extends TestCase
+final class GetUsersTestAction extends TestCase
 {
     use ContainerTestTrait;
     use HttpTestTrait;
