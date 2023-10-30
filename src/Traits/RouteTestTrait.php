@@ -14,7 +14,7 @@ trait RouteTestTrait
      *
      * @param string $routeName Route name
      * @param string[] $data Named argument replacement data
-     * @param string[] $queryParams Optional query string parameters.
+     * @param string[] $queryParams Optional query string parameters
      *
      * @return string The route with base path
      */
