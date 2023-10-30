@@ -13,8 +13,8 @@ trait RouteTestTrait
      * Build the path for a named route including the base path.
      *
      * @param string $routeName Route name
-     * @param string[] $data Named argument replacement data
-     * @param string[] $queryParams Optional query string parameters
+     * @param array<string, string> $data Named argument replacement data
+     * @param array<string, string> $queryParams Optional query string parameters
      *
      * @return string The route with base path
      */
