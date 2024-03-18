@@ -210,7 +210,7 @@ trait DatabaseSchemaTestTrait
             $object = new $fixture();
 
             foreach ($object->records as $row) {
-                $this->insertFixture($object->table, $row);
+                $this->insertFixtureRow($object->table, $row);
             }
         }
     }
@@ -223,7 +223,7 @@ trait DatabaseSchemaTestTrait
      *
      * @return int|null last insert id of auto increment column otherwise null
      */
-    protected function insertFixture(string $table, array $row): ?int
+    protected function insertFixtureRow(string $table, array $row): ?int
     {
         $fields = array_keys($row);
 
