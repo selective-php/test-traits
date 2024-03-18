@@ -143,7 +143,7 @@ trait DatabaseTableTestTrait
     }
 
     /**
-     * Asserts that a given table contains a given number of rows.
+     * Asserts that a given table row exists.
      *
      * @param string $table Table to look into
      * @param int $id The id
@@ -174,7 +174,7 @@ trait DatabaseTableTestTrait
     }
 
     /**
-     * Asserts that a given table contains a given number of rows.
+     * Asserts that a given table row does not exist.
      *
      * @param string $table Table to look into
      * @param int $id The id
