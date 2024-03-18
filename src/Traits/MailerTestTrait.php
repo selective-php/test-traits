@@ -25,12 +25,12 @@ use UnexpectedValueException;
  */
 trait MailerTestTrait
 {
-    protected function assertEmailCount(int $count, string $transport = null, string $message = ''): void
+    protected function assertEmailCount(int $count, ?string $transport = null, string $message = ''): void
     {
         $this->assertThat($this->getMessageMailerEvents(), new EmailCount($count, $transport), $message);
     }
 
-    protected function assertQueuedEmailCount(int $count, string $transport = null, string $message = ''): void
+    protected function assertQueuedEmailCount(int $count, ?string $transport = null, string $message = ''): void
     {
         $this->assertThat(
             $this->getMessageMailerEvents(),
@@ -120,12 +120,12 @@ trait MailerTestTrait
      *
      * @return MessageEvent[]
      */
-    protected function getMailerEvents(string $transport = null): array
+    protected function getMailerEvents(?string $transport = null): array
     {
         return $this->getMessageMailerEvents()->getEvents($transport);
     }
 
-    protected function getMailerEvent(int $index = 0, string $transport = null): ?MessageEvent
+    protected function getMailerEvent(int $index = 0, ?string $transport = null): ?MessageEvent
     {
         return $this->getMailerEvents($transport)[$index] ?? null;
     }
@@ -135,17 +135,17 @@ trait MailerTestTrait
      *
      * @return RawMessage[]
      */
-    protected function getMailerMessages(string $transport = null): array
+    protected function getMailerMessages(?string $transport = null): array
     {
         return $this->getMessageMailerEvents()->getMessages($transport);
     }
 
-    protected function findMailerMessage(int $index = 0, string $transport = null): ?RawMessage
+    protected function findMailerMessage(int $index = 0, ?string $transport = null): ?RawMessage
     {
         return $this->getMailerMessages($transport)[$index] ?? null;
     }
 
-    protected function getMailerMessage(int $index = 0, string $transport = null): RawMessage
+    protected function getMailerMessage(int $index = 0, ?string $transport = null): RawMessage
     {
         $message = $this->findMailerMessage($index, $transport);
 

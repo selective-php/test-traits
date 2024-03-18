@@ -25,7 +25,7 @@ trait DatabaseTableTestTrait
         array $expectedRow,
         string $table,
         int $id,
-        array $fields = null,
+        ?array $fields = null,
         string $message = ''
     ): void {
         $this->assertSame(
@@ -46,7 +46,7 @@ trait DatabaseTableTestTrait
      *
      * @return array Row
      */
-    protected function getTableRowById(string $table, int $id, array $fields = null): array
+    protected function getTableRowById(string $table, int $id, ?array $fields = null): array
     {
         $sql = sprintf('SELECT * FROM `%s` WHERE `id` = :id', $table);
         $statement = $this->createPreparedStatement($sql);
@@ -80,7 +80,7 @@ trait DatabaseTableTestTrait
         array $expectedRow,
         string $table,
         int $id,
-        array $fields = null,
+        ?array $fields = null,
         string $message = ''
     ): void {
         $this->assertEquals(
