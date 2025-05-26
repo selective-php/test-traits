@@ -22,7 +22,7 @@ trait DatabaseSchemaTestTrait
      *
      * @return void
      */
-    protected function setUpDatabase(string $schemaFile = null): void
+    protected function setUpDatabase(?string $schemaFile = null): void
     {
         if (isset($schemaFile)) {
             $this->schemaFile = $schemaFile;
