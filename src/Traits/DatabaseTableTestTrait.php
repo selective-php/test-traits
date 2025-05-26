@@ -46,7 +46,7 @@ trait DatabaseTableTestTrait
      *
      * @return array Row
      */
-    protected function getTableRowById(string $table, int $id, array $fields = null): array
+    protected function getTableRowById(string $table, int $id, ?array $fields = null): array
     {
         $sql = sprintf('SELECT * FROM `%s` WHERE `id` = :id', $table);
         $statement = $this->createPreparedStatement($sql);
